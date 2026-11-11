@@ -1,4 +1,9 @@
 window.addEventListener('error', function(e) {
+  // 【修复】忽略 ResizeObserver 的警告，它通常不影响运行
+  if (e.message && String(e.message).includes('ResizeObserver')) {
+    return;
+  }
+  
   console.error("编辑器报错:", e.message, e.filename, e.lineno);
   if (!window.__editorInited) {
     alert("编辑器加载失败: " + e.message + "\n请检查控制台。");
@@ -83,7 +88,7 @@ var level = defaultLevel();
 var ed = { tool: 'select', cam: { x: -40, y: -40 }, zoom: 0.7, selected: null, drag: null, panning: false, spaceDown: false, snap: true, gridSize: 10, mouseScreen: { x:0, y:0 }, mouseWorld: { x:0, y:0 }, dirty: true };
 var viewW = 800, viewH = 600;
 var history = { undo: [], redo: [], limit: 80 };
-var gameTemplateStr = ''; // 异步加载的模板字符串
+var gameTemplateStr = ''; 
 
 function cloneLevel(){
   return JSON.parse(JSON.stringify({ worldW: level.worldW, worldH: level.worldH, spawn: level.spawn, solids: level.solids, movers: level.movers, spikes: level.spikes, enemies: level.enemies, checkpoints: level.checkpoints, goal: level.goal }));
@@ -152,7 +157,24 @@ function deleteSelected(){
   ed.selected = null; refreshAll();
 }
 
-function resizeCanvas(){ var rect = cvs.getBoundingClientRect(); viewW = rect.width; viewH = rect.height; cvs.width = Math.round(viewW * dpr); cvs.height = Math.round(viewH * dpr); ed.dirty = true; }
+// 【修复】使用 requestAnimationFrame 避免 ResizeObserver 死循环
+var resizePending = false;
+function safeResize() {
+  if (resizePending) return;
+  resizePending = true;
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    resizePending = false;
+  });
+}
+
+function resizeCanvas(){ 
+  var rect = cvs.getBoundingClientRect(); 
+  if(rect.width === 0 || rect.height === 0) return;
+  viewW = rect.width; viewH = rect.height; 
+  cvs.width = Math.round(viewW * dpr); cvs.height = Math.round(viewH * dpr); 
+  ed.dirty = true; 
+}
 function fitView(){ ed.zoom = clamp(Math.min(viewW / level.worldW, viewH / level.worldH) * 0.94, 0.05, 3); ed.cam.x = level.worldW / 2 - viewW / (2 * ed.zoom); ed.cam.y = level.worldH / 2 - viewH / (2 * ed.zoom); updateZoomLabel(); ed.dirty = true; }
 function clamp(v,a,b){ return v<a?a:v>b?b:v; }
 function updateZoomLabel(){ $('zoom-label').textContent = Math.round(ed.zoom * 100) + '%'; }
@@ -350,9 +372,9 @@ function testPlay(){
     currentBlobUrl = URL.createObjectURL(blob);
     var iframe = $('test-frame');
     
-    // 【关键修复】监听 iframe 加载完成，强制让其获取焦点，否则无法响应键盘事件
+    // 监听 iframe 加载完成，强制让其获取焦点，否则无法响应键盘事件
     iframe.onload = function() { 
-      iframe.contentWindow.focus(); 
+      try { iframe.contentWindow.focus(); } catch(e) {}
     };
     iframe.src = currentBlobUrl;
     $('test-overlay').classList.remove('hidden');
@@ -385,18 +407,29 @@ function loadJSON(){
 async function init(){
   buildTools(); bindWorldInputs();
   $('btn-undo').addEventListener('click', doUndo); $('btn-redo').addEventListener('click', doRedo); $('btn-fit').addEventListener('click', fitView); $('btn-test').addEventListener('click', testPlay); $('btn-close-test').addEventListener('click', closeTest); $('btn-export').addEventListener('click', exportHTML); $('btn-save').addEventListener('click', saveJSON); $('btn-load').addEventListener('click', loadJSON);
-  window.addEventListener('resize', function(){ resizeCanvas(); ed.dirty = true; });
+  
+  window.addEventListener('resize', function(){ safeResize(); ed.dirty = true; });
+  
   resizeCanvas(); fitView(); refreshAll();
-  if(window.ResizeObserver){ new ResizeObserver(function(){ resizeCanvas(); }).observe(cvs.parentElement); }
+  
+  // 修复：把 ResizeObserver 的死循环警告降至最低，并用 rAF 防止报错
+  if(window.ResizeObserver){ 
+    new ResizeObserver(function(){ 
+      safeResize(); 
+    }).observe(cvs.parentElement); 
+  }
 
-  // 异步获取游戏模板文件
+  // 异步获取游戏模板
   try {
     const resp = await fetch('./game/template.html');
-    if(!resp.ok) throw new Error("找不到 game/template.html");
+    if(!resp.ok) throw new Error("HTTP " + resp.status + " - 找不到 game/template.html");
     gameTemplateStr = await resp.text();
   } catch (e) {
-    console.error("加载游戏模板失败:", e);
-    alert("加载游戏模板失败，请确保 game/template.html 存在且正通过 HTTP 服务器运行。\n(本地双击 index.html 会遇到跨域限制)");
+    if (window.location.protocol === 'file:') {
+      alert("浏览器 CORS 安全策略禁止读取本地文件。\n\n请务必使用本地服务器（如 VSCode 的 Live Server 插件）运行，或直接部署到 GitHub Pages 上访问。");
+    } else {
+      alert("加载游戏模板失败，请确保 game/template.html 路径正确。\n错误信息：" + e.message);
+    }
   }
 
   requestAnimationFrame(loop);
