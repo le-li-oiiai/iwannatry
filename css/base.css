@@ -1,0 +1,24 @@
+/* base.css —— 全局基础样式与通用按钮（选关界面和游戏界面共用） */
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;width:100%;background:#05050c;color:#c8d0e8;
+    font-family:'Courier New',Consolas,monospace;font-size:13px;overflow:hidden;
+    overscroll-behavior:none;-webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;}
+
+
+  /* ---------- 通用按钮 ---------- */
+  .btn{
+    background:#16302e;color:#7dfbe1;border:1px solid #2a5f57;
+    padding:8px 16px;border-radius:6px;cursor:pointer;font-family:inherit;
+    font-size:12px;transition:.13s;letter-spacing:.4px;white-space:nowrap;
+  }
+  .btn:hover{background:#175c53;border-color:#2a9b88;color:#a7fff0;}
+  .btn:active{transform:translateY(1px);}
+  .btn.ghost{background:#1a1a2e;color:#a0a8c8;border-color:#2f2f4d;}
+  .btn.ghost:hover{background:#252540;color:#fff;}
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#252540;border-radius:4px;}
+  ::-webkit-scrollbar-thumb:hover{background:#343460;}

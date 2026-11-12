@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>I Wanna Shoot · 选关</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+
+<div id="menu">
+  <div class="menu-inner">
+    <header class="menu-head">
+      <h1>🎮 I WANNA SHOOT</h1>
+      <p class="sub">S E L E C T   L E V E L</p>
+    </header>
+
+    <div class="section">
+      <div class="sec-head">
+        <span class="sec-title">可用关卡</span>
+        <button class="btn-sm" id="btn-refresh">🔄 刷新列表</button>
+      </div>
+      <div id="levels-grid" class="levels-grid"></div>
+      <div id="levels-status" class="status"></div>
+    </div>
+
+    <div class="section">
+      <div class="sec-head">
+        <span class="sec-title">添加关卡</span>
+      </div>
+      <p class="hint-text">
+        想分享关卡给朋友？把 <kbd>.json</kbd> 文件上传到本页面同目录，并在 <kbd>levels.json</kbd> 里登记。<br>
+        或者直接粘贴文本保存在你的浏览器本地。
+      </p>
+      <textarea id="paste-box" placeholder="粘贴编辑器导出的关卡 JSON 文本..."></textarea>
+      <div class="row">
+        <input id="level-name" type="text" placeholder="关卡名称（可选）">
+        <button class="btn" id="btn-save-local">💾 保存到本地</button>
+        <button class="btn ghost" id="btn-download">⬇ 下载 JSON</button>
+      </div>
+    </div>
+
+    <footer class="menu-foot">
+      用编辑器设计关卡 → 保存 JSON → 上传到本页面同目录<br>
+      也可以用 <kbd>?level=xxx.json</kbd> 直接分享单个关卡链接
+    </footer>
+  </div>
+</div>
+
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div class="portrait-tip">📱 建议横屏游玩</div>
+
+  <div id="touch-controls">
+    <div id="touch-move">
+      <div class="touch-btn" id="btn-left">◀</div>
+      <div class="touch-btn" id="btn-right">▶</div>
+    </div>
+    <div class="touch-btn" id="btn-jump">↑</div>
+  </div>
+
+  <div id="win-overlay">
+    <h2 class="win-title">🏆 YOU WIN!</h2>
+    <div class="win-sub">死亡次数: <span id="win-deaths">0</span></div>
+    <div class="win-actions">
+      <button id="btn-back-menu" class="btn ghost">返回选关</button>
+      <button id="btn-next-level" class="btn">下一关 ▶</button>
+    </div>
+  </div>
+</div>
+<button id="exit-btn">✕ 退出</button>
+
+<!-- 普通脚本按顺序加载（不用 ES Module，双击打开也能跑） -->
+<script src="js/core.js"></script>
+<script src="js/ui/storage.js"></script>
+<script src="js/level/normalize.js"></script>
+<script src="js/ui/level-list.js"></script>
+<script src="js/ui/game-screen.js"></script>
+<script src="js/engine/geometry.js"></script>
+<script src="js/engine/audio.js"></script>
+<script src="js/engine/input.js"></script>
+<script src="js/engine/update.js"></script>
+<script src="js/engine/draw.js"></script>
+<script src="js/engine/engine.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

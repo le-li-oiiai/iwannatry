@@ -1,0 +1,118 @@
+/* game.css —— 游戏界面（画布、触屏按钮、退出按钮、胜利界面） */
+
+  /* ============ 游戏全屏容器 ============ */
+  #wrap{
+    position:fixed;inset:0;
+    background:#000;
+    display:none;
+    align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  #wrap.visible{display:flex;}
+  #game{
+    display:block;
+    cursor:crosshair;
+    touch-action:none;
+    /* 尺寸由 JS 动态计算，保持 16:9 居中 */
+  }
+
+  .portrait-tip{
+    position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
+    background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.45);
+    color:#7dfbe1;padding:6px 16px;border-radius:20px;
+    font-size:12px;display:none;z-index:20;pointer-events:none;
+    white-space:nowrap;
+  }
+  @media (orientation: portrait){
+    #wrap.visible .portrait-tip{ display:block; }
+  }
+
+  /* ============ 触屏按钮 ============ */
+  #touch-controls{
+    display:none;
+    position:fixed;inset:0;
+    pointer-events:none;
+    z-index:30;
+  }
+  body.is-touch #touch-controls{ display:block; }
+
+  #touch-move{
+    position:absolute;
+    left:calc(16px + env(safe-area-inset-left,0px));
+    bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    display:flex;gap:14px;
+    pointer-events:none;
+  }
+  .touch-btn{
+    pointer-events:auto;
+    width:72px;height:72px;
+    border-radius:50%;
+    background:rgba(94,234,212,.16);
+    border:2px solid rgba(94,234,212,.55);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:bold;
+    user-select:none;-webkit-user-select:none;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .1s,transform .1s,border-color .1s;
+    line-height:1;
+  }
+  .touch-btn.active{
+    background:rgba(94,234,212,.5);
+    border-color:rgba(94,234,212,.95);
+    transform:scale(.94);
+  }
+  #btn-jump{
+    position:absolute;
+    right:calc(16px + env(safe-area-inset-right,0px));
+    bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    width:82px;height:82px;
+    font-size:32px;
+    background:rgba(167,139,250,.16);
+    border-color:rgba(167,139,250,.55);
+  }
+  #btn-jump.active{
+    background:rgba(167,139,250,.5);
+    border-color:rgba(167,139,250,.95);
+  }
+
+  /* ============ 退出按钮 ============ */
+  #exit-btn{
+    position:fixed;
+    top:calc(10px + env(safe-area-inset-top,0px));
+    right:calc(12px + env(safe-area-inset-right,0px));
+    z-index:60;
+    background:rgba(20,20,40,.88);color:#c8d0e8;border:1px solid #26263f;
+    padding:8px 14px;border-radius:6px;cursor:pointer;font-family:inherit;
+    font-size:12px;transition:.13s;display:none;backdrop-filter:blur(4px);
+  }
+  #exit-btn.visible{display:block;}
+  #exit-btn:hover{background:#252540;color:#fff;border-color:#3d3d66;}
+  #exit-btn:active{transform:scale(.95);}
+
+  /* ============ 胜利界面 ============ */
+  #win-overlay{
+    position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    background:rgba(5,5,15,.88);backdrop-filter:blur(6px);
+    opacity:0;pointer-events:none;transition:opacity .4s;
+  }
+  #win-overlay.visible{ opacity:1;pointer-events:auto; }
+  .win-title{
+    font-size:56px;color:#fde047;text-shadow:0 0 30px #fde047;
+    margin-bottom:10px;animation: bounceWin 1.5s infinite alternate;
+  }
+  @keyframes bounceWin { from{transform:translateY(0);} to{transform:translateY(-12px);} }
+  .win-sub{ font-size:18px;color:#e2e8f0;margin-bottom:40px; }
+  .win-actions{ display:flex;gap:16px; }
+  .win-actions .btn{ padding:10px 24px; font-size:14px; }
+
+  /* ---------- 小屏适配（游戏界面） ---------- */
+  @media (max-width: 600px){
+    .win-title{ font-size:40px; }
+    .win-sub{ font-size:15px; margin-bottom:28px; }
+    .win-actions{ gap:10px; }
+    .win-actions .btn{ padding:11px 18px; font-size:13px; }
+    #exit-btn{ padding:8px 12px; font-size:12px; }
+  }

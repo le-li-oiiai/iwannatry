@@ -1,0 +1,14 @@
+[
+  {
+    "file": "level.json",
+    "name": "第一关"
+  },
+  {
+    "file": "level2.json",
+    "name": "第二关"
+  },
+  {
+    "file": "level3.json",
+    "name": "第三关"
+  }
+]
